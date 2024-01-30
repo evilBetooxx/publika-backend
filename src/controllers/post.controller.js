@@ -1,9 +1,11 @@
 import Post from '../models/post.model.js';
 import { io } from '../app.js';
+import { v2 as cloudinary } from "cloudinary";
 
 export const getPosts = async (req, res) => {
     try {
         const posts = await Post.find();
+        console.log(posts);
         res.json(posts);
     } catch (error) {
         console.log(error);
@@ -29,12 +31,12 @@ export const getPostsByCategory = async (req, res) => {
 }
 
 export const createPost = async (req, res) => {
-    const { title, content, categoryID } = req.body;
+    const { title, content, categoryID, photo } = req.body;
 
     try {
-        const newPost = new Post({ title, content, categoryID, userID: req.user.id});
+        const newPost = new Post({ title, content, photo, categoryID, userID: req.user.id});
         const postSaved = await newPost.save();
-        io.emit("newBarberShop", savedBarberShop.name);
+        io.emit("newPost", postSaved.title);
         res.json(postSaved);
     } catch (error) {
         console.log(error);
@@ -60,3 +62,15 @@ export const deletePost = async (req, res) => {
         console.log(error);
     }
 }
+
+export const uploadPostImage = async (req, res) => {
+    try {
+      const imagenBuffer = req.file;
+      const result = await cloudinary.uploader.upload(imagenBuffer.path)
+      console.log(result.secure_url);
+  
+      res.json(result.secure_url);
+    } catch (error) {
+      console.log(error);
+    }
+  };

@@ -1,9 +1,10 @@
 import * as cat from '../controllers/category.controller.js';   
 import { Router } from 'express';
+import { authRequired } from '../middlewares/validateToken.js';
 
 const router = Router();
 
-router.get('/get-cat', cat.getCategories);
-router.post('/create-cat', cat.createCategory);
+router.get('/categories', authRequired, cat.getCategories);
+router.post('/create-categories', cat.createCategory);
 
 export default router;
