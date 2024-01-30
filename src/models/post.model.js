@@ -9,7 +9,7 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  category: {
+  categoryID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
     required: true,
