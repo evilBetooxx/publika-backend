@@ -1,4 +1,4 @@
-import * as comm from '../controllers/comment.controller';
+import * as comm from '../controllers/comment.controller.js';
 import { Router } from 'express';
 
 const router = Router();

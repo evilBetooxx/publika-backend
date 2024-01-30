@@ -35,10 +35,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/api", postRoutes);
-app.use("/api", commentRoutes);
-app.use("/api", authRoutes);
-app.use("/api", categoryRoutes);
+app.use("/publika", postRoutes);
+app.use("/publika", commentRoutes);
+app.use("/publika", authRoutes);
+app.use("/publika", categoryRoutes);
 
 io.on("connection", (socket) => {
   socket.on("message", (body) => {
@@ -49,4 +49,4 @@ io.on("connection", (socket) => {
   });
 });
 
-export default { server, io, app };
+export { server, io,   app };

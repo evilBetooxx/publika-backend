@@ -1,4 +1,5 @@
-import Post from '../models/post.model';
+import Post from '../models/post.model.js';
+import { io } from '../app.js';
 
 export const getPosts = async (req, res) => {
     try {
@@ -33,6 +34,7 @@ export const createPost = async (req, res) => {
     try {
         const newPost = new Post({ title, content, categoryID, userID: req.user.id});
         const postSaved = await newPost.save();
+        io.emit("newBarberShop", savedBarberShop.name);
         res.json(postSaved);
     } catch (error) {
         console.log(error);
