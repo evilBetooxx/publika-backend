@@ -1,16 +1,18 @@
 import Post from '../models/post.model.js';
+import Category from '../models/category.model.js';
 import { io } from '../app.js';
 import { v2 as cloudinary } from "cloudinary";
 
 export const getPosts = async (req, res) => {
     try {
-        const posts = await Post.find();
+        const posts = await Post.find().populate('categoryID').populate('userID');
         console.log(posts);
         res.json(posts);
     } catch (error) {
         console.log(error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-}
+};
 
 export const getPost = async (req, res) => {
     try {
