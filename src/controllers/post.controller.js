@@ -6,7 +6,6 @@ import { v2 as cloudinary } from "cloudinary";
 export const getPosts = async (req, res) => {
     try {
         const posts = await Post.find().populate('categoryID').populate('userID');
-        console.log(posts);
         res.json(posts);
     } catch (error) {
         console.log(error);
