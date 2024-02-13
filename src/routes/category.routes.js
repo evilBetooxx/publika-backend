@@ -5,6 +5,6 @@ import { authRequired } from '../middlewares/validateToken.js';
 const router = Router();
 
 router.get('/categories', authRequired, cat.getCategories);
-router.post('/create-categories', cat.createCategory);
+router.post('/categories', cat.createCategory);
 
 export default router;

@@ -21,6 +21,7 @@ export const register = async (req, res) => {
       username,
       password: passwordHash,
       photo: defaultPhoto,
+      online: true,
     });
 
     const userSaved = await newuser.save();
@@ -34,6 +35,7 @@ export const register = async (req, res) => {
       id: userSaved._id,
       username: userSaved.username,
       photo: userSaved.photo,
+      onlie: false,
     });
   } catch (error) {
     console.log(error);
@@ -53,6 +55,9 @@ export const login = async (req, res) => {
     if (!isMatch)
       return res.status(400).json({ message: "Contraseña incorrecta" });
 
+    userFound.online = true;
+    await userFound.save();
+
     const token = await createAccessToken({ id: userFound._id });
 
     res.cookie("token", token, {
@@ -71,10 +76,27 @@ export const login = async (req, res) => {
   }
 };
 
-export const logout = (req, res) => {
-  res.cookie("token", "", { expires: new Date(0) });
-  return res.sendStatus(200);
+export const logout = async (req, res) => {
+  try {
+    // Buscar al usuario en la base de datos
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      console.log('No se encontró ningún usuario con el ID proporcionado');
+      return res.sendStatus(404);
+    }
+
+    user.online = false;
+    await user.save();
+
+    res.cookie("token", "", { expires: new Date(0) });
+    return res.sendStatus(200);
+  } catch (error) {
+    console.log('Error al hacer logout:', error);
+    return res.sendStatus(500);
+  }
 };
+
 
 export const verifyToken = async (req, res) => {
   const { token } = req.cookies;

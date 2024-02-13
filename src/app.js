@@ -6,6 +6,7 @@ import { config } from "dotenv";
 import http from "http";
 import { Server as SocketServer } from "socket.io";
 
+import UserRoutes from "./routes/user.routes.js";
 import postRoutes from "./routes/post.routes.js";
 import commentRoutes from "./routes/comment.routes.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -35,6 +36,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
+app.use("/publika", UserRoutes);
 app.use("/publika", postRoutes);
 app.use("/publika", commentRoutes);
 app.use("/publika", authRoutes);
