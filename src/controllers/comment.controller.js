@@ -2,7 +2,7 @@ import Comment from "../models/comment.model.js";
 
 export const getComments = async (req, res) => {
   try {
-    const comments = await Comment.find({ postID: req.params.id });
+    const comments = await Comment.find();
     res.json(comments);
   } catch (error) {
     console.log(error);
@@ -10,13 +10,11 @@ export const getComments = async (req, res) => {
 };
 
 export const createComment = async (req, res) => {
-  const { title, content, postID } = req.body;
+  const { content } = req.body;
 
   try {
     const newComment = new Comment({
-      title,
       content,
-      postID,
       userID: req.user.id,
     });
     const commentSaved = await newComment.save();
