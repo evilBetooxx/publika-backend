@@ -1,15 +1,46 @@
 import Comment from "../models/comment.model.js";
 
+let comments = {};
+let hasNewComment = false;
+
 export const getComments = async (req, res) => {
   try {
-    const comments = await Comment.find();
-    res.json(comments);
+    const id = Math.random();
+    res.setHeader("Content-Type", "text/plain;charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache, must-revalidate");
+    comments[id] = res;
+
+    req.on("close", function () {
+      delete comments[id];
+    });
+
+    await waitForComments(id);
   } catch (error) {
     console.log(error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
+const waitForComments = async (id) => {
+  return new Promise((resolve) => {
+    const intervalId = setInterval(() => {
+      if (hasNewComment) {
+        clearInterval(intervalId);
+        resolve();
+        hasNewComment = false;
+      }
+    }, 1000); // Revisar cada segundo si hay nuevos comentarios
+
+    // Si la conexión se cierra, eliminar la suscripción
+    comments[id].on("close", () => {
+      clearInterval(intervalId);
+      delete comments[id];
+    });
+  });
+};
+
 export const createComment = async (req, res) => {
+  console.log(req.body);
   const { content } = req.body;
 
   try {
@@ -18,9 +49,21 @@ export const createComment = async (req, res) => {
       userID: req.user.id,
     });
     const commentSaved = await newComment.save();
+
+    // Marcar que hay un nuevo comentario
+    hasNewComment = true;
+
+    // Enviar el nuevo comentario a todos los suscriptores
+    for (let id in comments) {
+      let res = comments[id];
+      res.end(JSON.stringify(commentSaved));
+      delete comments[id];
+    }
+
     res.json(commentSaved);
   } catch (error) {
     console.log(error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
