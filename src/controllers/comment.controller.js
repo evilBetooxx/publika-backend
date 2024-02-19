@@ -6,15 +6,14 @@ let hasNewComment = false;
 export const getComments = async (req, res) => {
   try {
     const id = Math.random();
-    res.setHeader("Content-Type", "text/plain;charset=utf-8");
-    res.setHeader("Cache-Control", "no-cache, must-revalidate");
     comments[id] = res;
 
     req.on("close", function () {
       delete comments[id];
     });
 
-    await waitForComments(id);
+    const data = await waitForComments(id);
+    res.json(data);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });
@@ -29,9 +28,9 @@ const waitForComments = async (id) => {
         resolve();
         hasNewComment = false;
       }
-    }, 1000); // Revisar cada segundo si hay nuevos comentarios
+    }, 1000);
 
-    // Si la conexión se cierra, eliminar la suscripción
+    
     comments[id].on("close", () => {
       clearInterval(intervalId);
       delete comments[id];
@@ -50,10 +49,10 @@ export const createComment = async (req, res) => {
     });
     const commentSaved = await newComment.save();
 
-    // Marcar que hay un nuevo comentario
+    
     hasNewComment = true;
 
-    // Enviar el nuevo comentario a todos los suscriptores
+    
     for (let id in comments) {
       let res = comments[id];
       res.end(JSON.stringify(commentSaved));
